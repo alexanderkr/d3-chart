@@ -1023,6 +1023,4 @@ class ColorProvider {
 
         return result
     }
-
 }
-export default ColorProvider;

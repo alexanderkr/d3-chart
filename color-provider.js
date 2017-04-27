@@ -1,4 +1,11 @@
+
+const INITIAL_COLOR_GROUP = 5;
+const INITIAL_COLOR = 0;
+const UNDEFINED_COLOR = -1;
+
 class ColorProvider {
+
+
     constructor() {
         this.colors =
             {
@@ -1000,16 +1007,16 @@ class ColorProvider {
                 ]
             }
 
-        this.type = 5;
-        this.color = -1;
+        this.type = INITIAL_COLOR_GROUP;
+        this.color = UNDEFINED_COLOR;
     }
 
     next() {
         var group = Object.keys(this.colors)[this.type]
 
         if (!group) {
-            this.type = 3;
-            this.color = 0;
+            this.type = INITIAL_COLOR_GROUP;
+            this.color = INITIAL_COLOR;
             return this.next();
         }
 

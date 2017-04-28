@@ -3,9 +3,10 @@ var width = 500,
     radius = Math.min(width, height) / 2;
 
 var arc = d3.svg.arc()
-    // .attr('id', function(d) {return 'arc' + d.data.is;})
+// .attr('id', function(d) {return 'arc' + d.data.is;})
     .innerRadius(0)
     .outerRadius(function (d) {
+        console.log(d)
         return radius * (d.data.score / 100.0);
     })
     .cornerRadius(0)
@@ -19,9 +20,7 @@ var outlineArc = d3.svg.arc()
 var pie = d3.layout.pie()
     .padAngle(0)
     .sort(null)
-    .value(function (d) {
-        return d.width;
-    });
+    .value(function (d) { return d.width; });
 
 var tip = d3.tip()
     .attr('class', 'd3-tip')
@@ -99,15 +98,15 @@ function buildChart() {
         path
             .enter()
             .append("path")
-            .attr("fill", function (d) {
-                return d.data.color;
-            })
+            .attr("fill", function(d) {return d.data.color; })
+            .attr("id", function(d) {return 'arc-' + d.data.id })
             .attr("class", "solidArc")
             .attr("stroke", "#6e6e6e")
             .attr("stroke-width", 0.5)
             .attr('fill-opacity', 1)
             .style("filter", "url(#drop-shadow)")
             .attr("d", arc)
+            .each(function (d) { this._current = d; })
             .on('mouseout', tip.hide, function (d) {
                 d3.select(this)
                     .transition()
@@ -130,14 +129,50 @@ function buildChart() {
             .append("path")
             .attr("fill", "none")
             .attr("stroke", "white")
-            .attr("stroke-width", 2)
+            .attr("stroke-width", 0.5)
             .attr("class", "outlineArc")
             .attr("d", outlineArc);
-
     });
-    clearTimeout(timeout);
-    timeout = setTimeout(buildChart, 10000);
+    // clearTimeout(timeout);
+    // timeout = setTimeout(buildChart, 10000);
 }
+
+
+function update() {
+    var path = svg.selectAll(".solidArc")
+    var data = [
+        {
+            "id": "1",
+            "order": 3,
+            "score": 35,
+            "weight": 23,
+            "width": 23,
+            "color": "red",
+            "label": "label 1"
+        },
+        {
+            "id": "2",
+            "order": 54,
+            "score": 53,
+            "weight": 100,
+            "width": 100,
+            "color": "red",
+            "label": "label 2"
+        }
+    ]
+    path = path.data(pie(data)); // compute the new angles
+    path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+}
+
+function arcTween(a) {
+
+    var i = d3.interpolate(this._current, a);
+    this._current = i(0);
+    return function (t) {
+        return arc(i(t));
+    };
+}
+
 var timeout;
 
 buildChart();
